@@ -14,21 +14,98 @@
 ![addText](https://user-images.githubusercontent.com/71283039/131778300-effbd723-24d1-4f75-a2b4-022e35535a07.gif) 
 
 ## Location
-> Find out your ***location address***
+Find out your ***location address***
 
 ![location](https://user-images.githubusercontent.com/71283039/131780549-14e0e110-7f5d-4c04-bd5e-a0a6e31de244.gif)
 
 ## Photo ***of the*** Place
-> ***Take pictures*** of places
+***Take pictures*** of places
 
 ![takePhoto](https://user-images.githubusercontent.com/71283039/131781188-4e07e2a0-0923-44e7-a0df-a1c2c8985a94.gif)
 
 ## Search ***and*** Sorting
-> ***Sort*** by date added and by name
+***Sort*** by date added and by name
 
 ![search](https://user-images.githubusercontent.com/71283039/131781651-ce9b0cfc-0115-482d-97b3-7571099fd381.gif)
 
-### Follow ***me***
+## Get Direction ***&*** Show Route
+
+`let locationManager = CLLocationManager()`
+
+`func getDirections(for mapView: MKMapView, previousLocation: (CLLocation) -> ()) {`
+
+> User Location Coordinates
+
+```        
+        guard let location = locationManager.location?.coordinate else {
+            showAlert(title: "Error", message: "Current location is not found")
+            return
+        }
+```
+> The mode used to track the user location
+        
+``` 
+        locationManager.startUpdatingLocation()
+        previousLocation(CLLocation(latitude: location.latitude, longitude: location.longitude)) 
+```
+> Route request
+
+```
+        guard let request = createDirectionRequest(from: location) else { 
+            showAlert(title: "Error", message: "Destination is not found")
+            return
+        }
+```
+> Draw a route
+
+```
+        let directions = MKDirections(request: request) 
+        resetMapView(withNew: directions, mapView: mapView)
+```   
+> Route calculation
+
+``` 
+        directions.calculate { (response, error) in 
+            
+            if let error = error {
+                print(error)
+                return
+            }
+```           
+>> Fetch route         
+  
+```
+            guard let response = response else { 
+                self.showAlert(title: "Error", message: "Destinations are not available")
+                return
+            }
+```
+>>> Route selection. Overlay routes
+  
+```
+            for route in response.routes { 
+                mapView.addOverlay(route.polyline)
+```
+ 
+>>> Focusing the map
+   
+```
+                mapView.setVisibleMapRect(route.polyline.boundingMapRect, animated: true)   
+```
+>>> Travel Time and Distance. %.1f - round up to 0,1
+   
+```                  
+                let distance = String(format: "%.1f", route.distance / 1000) 
+                let timeInterval = route.expectedTravelTime
+            }
+        }
+    }
+``` 
+    
+
+![route](https://user-images.githubusercontent.com/71283039/132023936-86fa4728-712f-4312-84d7-b13b636887a6.gif)
+
+## Follow ***me***
 
 [<img src="https://user-images.githubusercontent.com/71283039/132022115-2858493b-14de-4b86-8b95-b0bac4f1cb18.png" alt="linkedin" width="30"/>][linkedin]
 [<img src="https://user-images.githubusercontent.com/71283039/132022727-fe1359e1-1446-46a0-baac-a62753330116.png" alt="instagram" width="30"/>][instagram]
